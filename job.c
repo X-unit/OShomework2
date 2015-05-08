@@ -51,6 +51,8 @@ void scheduler()
 
 	int  count = 0;
 
+	char timebuf[BUFLEN];
+
 	bzero(&cmd,DATALEN);
 
 	if((count=read(fifo,&cmd,DATALEN))<0)
@@ -110,6 +112,20 @@ void scheduler()
 	/* Ñ¡ÔñžßÓÅÏÈŒ¶×÷Òµ */
 
 	next=jobselect();
+	//输出jobselect选择的作业的信息
+#ifdef DEBUG
+printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\tDEBUG!!!\n");
+if(next){
+strcpy(timebuf,ctime(&(next->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			next->job->jid,
+			next->job->pid,
+			next->job->ownerid,
+			next->job->run_time,
+			next->job->wait_time,
+			timebuf,"READY");
+}
 
 	/* ×÷ÒµÇÐ»» */
 
