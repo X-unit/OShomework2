@@ -68,9 +68,37 @@ void updateall()
 {
 	struct waitqueue *p;
 
+        #ifdef DEBUG
+	char timebuf[BUFLEN];
+	printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\n");
+	if(current){
+		strcpy(timebuf,ctime(&(current->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			current->job->jid,
+			current->job->pid,
+			current->job->ownerid,
+			current->job->run_time,
+			current->job->wait_time,
+			timebuf,"RUNNING");
+	}
+
+	for(p=head;p!=NULL;p=p->next){
+		strcpy(timebuf,ctime(&(p->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			p->job->jid,
+			p->job->pid,
+			p->job->ownerid,
+			p->job->run_time,
+			p->job->wait_time,
+			timebuf,
+			"READY");
+	}
+        #endif
 	/* 更新作业运行时间 */
 	if(current)
-		current->job->run_time += 1; /* 加1代表1000ms */
+		current->job->run_time += 1; /* ŒÓ1Žú±í1000ms */
 
 	/* 更新作业等待时间及优先级 */
 	for(p = head; p != NULL; p = p->next){
@@ -80,6 +108,33 @@ void updateall()
 			p->job->wait_time = 0;
 		}
 	}
+        #ifdef DEBUG
+  printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\n");
+	if(current){
+		strcpy(timebuf,ctime(&(current->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			current->job->jid,
+			current->job->pid,
+			current->job->ownerid,
+			current->job->run_time,
+			current->job->wait_time,
+			timebuf,"RUNNING");
+	}
+
+	for(p=head;p!=NULL;p=p->next){
+		strcpy(timebuf,ctime(&(p->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			p->job->jid,
+			p->job->pid,
+			p->job->ownerid,
+			p->job->run_time,
+			p->job->wait_time,
+			timebuf,
+			"READY");
+	}
+        #endif
 }
 
 struct waitqueue* jobselect()
