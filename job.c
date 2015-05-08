@@ -59,7 +59,7 @@ void scheduler()
 
 #ifdef DEBUG
 
-
+        printf("Reading whether other process send comand!\n");
 
 	if(count){
 
@@ -75,6 +75,9 @@ void scheduler()
 
 
 	/* žüÐÂµÈŽý¶ÓÁÐÖÐµÄ×÷Òµ */
+#ifdef DEBUG
+         printf("Update jobs in wait queue!\n");
+#endif
 	updateall();
 
 
@@ -82,18 +85,27 @@ void scheduler()
 	switch(cmd.type){
 
 	case ENQ:
+#ifdef DEBUG
+         printf("Execute enq!\n");
+#endif
 
 		do_enq(newjob,cmd);
 
 		break;
 
 	case DEQ:
+#ifdef DEBUG
+         printf("Execute deq!\n");
+#endif
 
 		do_deq(cmd);
 
 		break;
 
 	case STAT:
+#ifdef DEBUG
+         printf("Execute stat!\n");
+#endif
 
 		do_stat(cmd);
 
@@ -105,13 +117,18 @@ void scheduler()
 
 	}
 
-
+#ifdef DEBUG
+         printf("Select witch job to run next!\n");
+#endif
 
 	/* Ñ¡ÔñžßÓÅÏÈŒ¶×÷Òµ */
 
 	next=jobselect();
 
 	/* ×÷ÒµÇÐ»» */
+#ifdef DEBUG
+         printf("awitch to the next job!\n");
+#endif
 
 	jobswitch();
 
