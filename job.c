@@ -254,7 +254,34 @@ void do_enq(struct jobinfo *newjob,struct jobcmd enqcmd)
 	sigset_t zeromask;
 
 	sigemptyset(&zeromask);
+#ifdef DEBUG
+	char timebuf[BUFLEN];
+	printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\n");
+	if(current){
+		strcpy(timebuf,ctime(&(current->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			current->job->jid,
+			current->job->pid,
+			current->job->ownerid,
+			current->job->run_time,
+			current->job->wait_time,
+			timebuf,"RUNNING");
+	}
 
+	for(p=head;p!=NULL;p=p->next){
+		strcpy(timebuf,ctime(&(p->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			p->job->jid,
+			p->job->pid,
+			p->job->ownerid,
+			p->job->run_time,
+			p->job->wait_time,
+			timebuf,
+			"READY");
+	}
+        #endif
 	/* 封装jobinfo数据结构 */
 	newjob = (struct jobinfo *)malloc(sizeof(struct jobinfo));
 	newjob->jid = allocjid();
@@ -326,6 +353,33 @@ void do_enq(struct jobinfo *newjob,struct jobcmd enqcmd)
 	}else{
 		newjob->pid=pid;
 	}
+	#ifdef DEBUG
+	printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\n");
+	if(current){
+		strcpy(timebuf,ctime(&(current->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			current->job->jid,
+			current->job->pid,
+			current->job->ownerid,
+			current->job->run_time,
+			current->job->wait_time,
+			timebuf,"RUNNING");
+	}
+
+	for(p=head;p!=NULL;p=p->next){
+		strcpy(timebuf,ctime(&(p->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			p->job->jid,
+			p->job->pid,
+			p->job->ownerid,
+			p->job->run_time,
+			p->job->wait_time,
+			timebuf,
+			"READY");
+	}
+        #endif
 }
 
 void do_deq(struct jobcmd deqcmd)
@@ -333,7 +387,36 @@ void do_deq(struct jobcmd deqcmd)
 	int deqid,i;
 	struct waitqueue *p,*prev,*select,*selectprev;
 	deqid=atoi(deqcmd.data);
+	
+#ifdef DEBUG
+	char timebuf[BUFLEN];
+	printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\n");
+	if(current){
+		strcpy(timebuf,ctime(&(current->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			current->job->jid,
+			current->job->pid,
+			current->job->ownerid,
+			current->job->run_time,
+			current->job->wait_time,
+			timebuf,"RUNNING");
+	}
 
+	for(p=head;p!=NULL;p=p->next){
+		strcpy(timebuf,ctime(&(p->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			p->job->jid,
+			p->job->pid,
+			p->job->ownerid,
+			p->job->run_time,
+			p->job->wait_time,
+			timebuf,
+			"READY");
+	}
+        #endif
+        
 #ifdef DEBUG
 	printf("deq jid %d\n",deqid);
 #endif
@@ -376,6 +459,33 @@ void do_deq(struct jobcmd deqcmd)
 			select=NULL;
 		}
 	}
+	#ifdef DEBUG
+	printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\n");
+	if(current){
+		strcpy(timebuf,ctime(&(current->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			current->job->jid,
+			current->job->pid,
+			current->job->ownerid,
+			current->job->run_time,
+			current->job->wait_time,
+			timebuf,"RUNNING");
+	}
+
+	for(p=head;p!=NULL;p=p->next){
+		strcpy(timebuf,ctime(&(p->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			p->job->jid,
+			p->job->pid,
+			p->job->ownerid,
+			p->job->run_time,
+			p->job->wait_time,
+			timebuf,
+			"READY");
+	}
+        #endif
 }
 
 void do_stat(struct jobcmd statcmd)
