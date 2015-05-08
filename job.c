@@ -19,7 +19,6 @@
 #include <time.h>
 
 #include "job.h"
-
 #define DEBUG
 
 
@@ -75,15 +74,7 @@ void scheduler()
 #endif
 
 
-
 	/* žüÐÂµÈŽý¶ÓÁÐÖÐµÄ×÷Òµ */
-
-        #ifdef DEBUG
-
-          printf("Update jobs in wait queue!\n");
-
-        #endif
-
 	updateall();
 
 
@@ -92,35 +83,17 @@ void scheduler()
 
 	case ENQ:
 
-        #ifdef DEBUG
-
-           printf("Execute enq!\n");
-
-        #endif
-
 		do_enq(newjob,cmd);
 
 		break;
 
 	case DEQ:
 
-        #ifdef DEBUG
-
-           printf("Execute deq!\n");
-
-        #endif
-
 		do_deq(cmd);
 
 		break;
 
 	case STAT:
-
-        #ifdef DEBUG
-
-           printf("Execute stat!\n");
-
-        #endif
 
 		do_stat(cmd);
 
@@ -132,28 +105,17 @@ void scheduler()
 
 	}
 
-        #ifdef DEBUG
 
-           printf("Select witch job to run next!\n");
-
-        #endif
 
 	/* Ñ¡ÔñžßÓÅÏÈŒ¶×÷Òµ */
 
 	next=jobselect();
-
-        #ifdef DEBUG
-
-           printf("switch to the next job!\n");
-
-        #endif
 
 	/* ×÷ÒµÇÐ»» */
 
 	jobswitch();
 
 }
-
 
 
 int allocjid()
@@ -163,7 +125,6 @@ int allocjid()
 	return ++jobid;
 
 }
-
 
 
 void updateall()
@@ -191,9 +152,7 @@ void updateall()
 		if(p->job->wait_time >= 5000 && p->job->curpri < 3){
 
 			p->job->curpri++;
-
 			p->job->wait_time = 0;
-
 		}
 
 	}
@@ -299,7 +258,6 @@ void jobswitch()
 		current = next;
 
 		next = NULL;
-
 		current->job->state = RUNNING;
 
 		kill(current->job->pid,SIGCONT);
@@ -375,12 +333,6 @@ void sig_handler(int sig,siginfo_t *info,void *notused)
 case SIGVTALRM: /* µœŽïŒÆÊ±Æ÷ËùÉèÖÃµÄŒÆÊ±Œäžô */
 
 	scheduler();
-
-        #ifdef DEBUG
-
-        printf("SIGVTALRM RECEIVED!\n");
-
-        #endif
 
 	return;
 
@@ -533,13 +485,9 @@ void do_enq(struct jobinfo *newjob,struct jobcmd enqcmd)
 		head=newnode;
 
 
-
 	/*Îª×÷ÒµŽŽœšœø³Ì*/
-
 	if((pid=fork())<0)
-
 		error_sys("enq fork failed");
-
 
 
 	if(pid==0){
@@ -685,7 +633,6 @@ void do_deq(struct jobcmd deqcmd)
 }
 
 
-
 void do_stat(struct jobcmd statcmd)
 
 {
@@ -783,12 +730,9 @@ int main()
 	struct stat statbuf;
 
 	struct sigaction newact,oldact1,oldact2;
-
-        #ifdef DEBUG
-
-                    printf("DEBUG IS OPEN!\n");
-
-        #endif
+#ifdef DEBUG
+       printf("DEBUG IS OPEN!\n");
+#endif
 
 
 
