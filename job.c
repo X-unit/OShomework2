@@ -27,6 +27,7 @@ void scheduler()
 	struct jobcmd cmd;
 	int  count = 0;
 	char timebuf[BUFLEN];
+	struct waitqueue *p=NULL;
 	bzero(&cmd,DATALEN);
 	if((count=read(fifo,&cmd,DATALEN))<0)
 		error_sys("read fifo failed");
@@ -58,23 +59,63 @@ void scheduler()
 
 	/* 选择高优先级作业 */
 	next=jobselect();
-//输出jobselect选择的作业的信息
+
 #ifdef DEBUG
-printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\tDEBUG!!!\n");
-if(next){
-strcpy(timebuf,ctime(&(next->job->create_time)));
+printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\tBEFORE SWITCH!!!\n");
+	if(current){
+		strcpy(timebuf,ctime(&(current->job->create_time)));
 		timebuf[strlen(timebuf)-1]='\0';
 		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
-			next->job->jid,
-			next->job->pid,
-			next->job->ownerid,
-			next->job->run_time,
-			next->job->wait_time,
-			timebuf,"READY");
-}
+			current->job->jid,
+			current->job->pid,
+			current->job->ownerid,
+			current->job->run_time,
+			current->job->wait_time,
+			timebuf,"RUNNING");
+	}
+
+	for(p=head;p!=NULL;p=p->next){
+		strcpy(timebuf,ctime(&(p->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			p->job->jid,
+			p->job->pid,
+			p->job->ownerid,
+			p->job->run_time,
+			p->job->wait_time,
+			timebuf,
+			"READY");
+	}
 #endif
 	/* 作业切换 */
 	jobswitch();
+#ifdef DEBUG
+printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\tAFTERSWITCH!!!\n");
+	if(current){
+		strcpy(timebuf,ctime(&(current->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			current->job->jid,
+			current->job->pid,
+			current->job->ownerid,
+			current->job->run_time,
+			current->job->wait_time,
+			timebuf,"RUNNING");
+	}
+
+	for(p=head;p!=NULL;p=p->next){
+		strcpy(timebuf,ctime(&(p->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			p->job->jid,
+			p->job->pid,
+			p->job->ownerid,
+			p->job->run_time,
+			p->job->wait_time,
+			timebuf,
+			"READY");
+	}
+#endif
 }
 
 int allocjid()
