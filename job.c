@@ -10,7 +10,7 @@
 #include <time.h>
 #include "job.h"
 
-#define DEBUG
+#define DEBUG1
 
 int jobid=0;
 int siginfo=1;
@@ -26,12 +26,10 @@ void scheduler()
 	struct jobinfo *newjob=NULL;
 	struct jobcmd cmd;
 	int  count = 0;
-	char timebuf[BUFLEN];
-	struct waitqueue *p=NULL;
 	bzero(&cmd,DATALEN);
 	if((count=read(fifo,&cmd,DATALEN))<0)
 		error_sys("read fifo failed");
-/*#ifdef DEBUG
+#ifdef DEBUG
 
 	if(count){
 		printf("cmd cmdtype\t%d\ncmd defpri\t%d\ncmd data\t%s\n",cmd.type,cmd.defpri,cmd.data);
@@ -39,7 +37,7 @@ void scheduler()
 	else
 		printf("no data read\n");
 #endif
-*/
+
 	/* 更新等待队列中的作业 */
 	updateall();
 
@@ -59,63 +57,8 @@ void scheduler()
 
 	/* 选择高优先级作业 */
 	next=jobselect();
-
-#ifdef DEBUG
-printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\tBEFORE SWITCH!!!\n");
-	if(current){
-		strcpy(timebuf,ctime(&(current->job->create_time)));
-		timebuf[strlen(timebuf)-1]='\0';
-		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
-			current->job->jid,
-			current->job->pid,
-			current->job->ownerid,
-			current->job->run_time,
-			current->job->wait_time,
-			timebuf,"RUNNING");
-	}
-
-	for(p=head;p!=NULL;p=p->next){
-		strcpy(timebuf,ctime(&(p->job->create_time)));
-		timebuf[strlen(timebuf)-1]='\0';
-		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
-			p->job->jid,
-			p->job->pid,
-			p->job->ownerid,
-			p->job->run_time,
-			p->job->wait_time,
-			timebuf,
-			"READY");
-	}
-#endif
 	/* 作业切换 */
 	jobswitch();
-#ifdef DEBUG
-printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\tAFTERSWITCH!!!\n");
-	if(current){
-		strcpy(timebuf,ctime(&(current->job->create_time)));
-		timebuf[strlen(timebuf)-1]='\0';
-		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
-			current->job->jid,
-			current->job->pid,
-			current->job->ownerid,
-			current->job->run_time,
-			current->job->wait_time,
-			timebuf,"RUNNING");
-	}
-
-	for(p=head;p!=NULL;p=p->next){
-		strcpy(timebuf,ctime(&(p->job->create_time)));
-		timebuf[strlen(timebuf)-1]='\0';
-		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
-			p->job->jid,
-			p->job->pid,
-			p->job->ownerid,
-			p->job->run_time,
-			p->job->wait_time,
-			timebuf,
-			"READY");
-	}
-#endif
 }
 
 int allocjid()
@@ -225,11 +168,19 @@ void sig_handler(int sig,siginfo_t *info,void *notused)
 	int status;
 	int ret;
 
+	char timebuf[BUFLEN];
+	struct waitqueue *p;
+
 	switch (sig) {
 case SIGVTALRM: /* 到达计时器所设置的计时间隔 */
 	scheduler();
 	return;
 case SIGCHLD: /* 子进程结束时传送给父进程的信号 */
+
+
+
+
+
 	ret = waitpid(-1,&status,WNOHANG);
 	if (ret == 0)
 		return;
@@ -241,6 +192,33 @@ case SIGCHLD: /* 子进程结束时传送给父进程的信号 */
 	}else if (WIFSTOPPED(status)){
 		printf("child stopped, signal number = %d\n",WSTOPSIG(status));
 	}
+#ifdef DEBUG1
+printf("JOBID\tPID\tOWNER\tRUNTIME\tWAITTIME\tCREATTIME\t\tSTATE\n");
+	if(current){
+		strcpy(timebuf,ctime(&(current->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			current->job->jid,
+			current->job->pid,
+			current->job->ownerid,
+			current->job->run_time,
+			current->job->wait_time,
+			timebuf,"RUNNING");
+	}
+
+	for(p=head;p!=NULL;p=p->next){
+		strcpy(timebuf,ctime(&(p->job->create_time)));
+		timebuf[strlen(timebuf)-1]='\0';
+		printf("%d\t%d\t%d\t%d\t%d\t%s\t%s\n",
+			p->job->jid,
+			p->job->pid,
+			p->job->ownerid,
+			p->job->run_time,
+			p->job->wait_time,
+			timebuf,
+			"READY");
+	}
+#endif
 	return;
 	default:
 		return;
@@ -327,6 +305,7 @@ void do_enq(struct jobinfo *newjob,struct jobcmd enqcmd)
 		exit(1);
 	}else{
 		newjob->pid=pid;
+		wait(NULL);
 	}
 }
 
